@@ -18,6 +18,7 @@ namespace CountLines
         /// the dialog to choose the root (project) dir
         /// </summary>
         private readonly OpenFileDialog _dialog = new OpenFileDialog();
+
         /// <summary>
         /// the cancellation token source to cancel the run
         /// </summary>
@@ -27,6 +28,7 @@ namespace CountLines
         /// the result for the current run
         /// </summary>
         private static CountLinesResult _currentResult;
+
         /// <summary>
         /// the total files to scan (for the current run)
         /// </summary>
@@ -80,7 +82,12 @@ namespace CountLines
                     FormatIgnoreList();
                 }
             };
+
         }
+
+
+
+
 
         /// <summary>
         /// formats the ignore list entries 
@@ -322,7 +329,7 @@ namespace CountLines
                     int lines = File.ReadLines(fileInfo.FullName).Count();
                     _currentResult.Lines += lines;
                     _currentResult.Files += 1;
-                    ReportProgress(fileInfo.FullName);
+                    ReportProgress(fileInfo.FullName + "(" + lines + ")");
 
                     if (_cancelToken.Token.IsCancellationRequested)
                     {
