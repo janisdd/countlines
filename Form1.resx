@@ -117,7 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="tbIgnoreList.Text" xml:space="preserve">
+    <value>#Just like a git ignore file ... every line identifies a file or a directory that should be excluded 
+#Lines starting with # indicates comments
+# you can use absolute paths or of they are not found then they are interpret as relative pths (to the root path)
+#e.g.
+#node_modules
+#ignore</value>
+  </data>
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="tbIgnoreFileConfig.ToolTip" xml:space="preserve">
+    <value>a file containing additional ignore rules (same syntax as the ignore list)
+if both a file and the ignore list is specified they are merged
+the rules are absolute paths or relative to the root path (not relative to the ignore file!)</value>
+  </data>
 </root>

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.label1 = new System.Windows.Forms.Label();
             this.tbIgnoreList = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -49,6 +50,14 @@
             this.tbExtensions = new System.Windows.Forms.TextBox();
             this.tbFoundFiles = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.btnChooseIgnoreFile = new System.Windows.Forms.Button();
+            this.tbIgnoreFileConfig = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.rbAllLines = new System.Windows.Forms.RadioButton();
+            this.rbIgnoreEmptyLines = new System.Windows.Forms.RadioButton();
+            this.rbIgnoreEmptyOrWhitespaceLines = new System.Windows.Forms.RadioButton();
+            this.label9 = new System.Windows.Forms.Label();
+            this.numIgnoreRules = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -65,19 +74,18 @@
             // 
             this.tbIgnoreList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbIgnoreList.Location = new System.Drawing.Point(11, 118);
+            this.tbIgnoreList.Location = new System.Drawing.Point(11, 155);
             this.tbIgnoreList.Multiline = true;
             this.tbIgnoreList.Name = "tbIgnoreList";
             this.tbIgnoreList.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbIgnoreList.Size = new System.Drawing.Size(526, 200);
+            this.tbIgnoreList.Size = new System.Drawing.Size(526, 181);
             this.tbIgnoreList.TabIndex = 2;
-            this.toolTip1.SetToolTip(this.tbIgnoreList, "Just like a git ignore file ... every line identifies a file or a directory that " +
-        "should be excluded");
+            this.tbIgnoreList.Text = resources.GetString("tbIgnoreList.Text");
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 102);
+            this.label2.Location = new System.Drawing.Point(13, 137);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(59, 13);
             this.label2.TabIndex = 3;
@@ -109,12 +117,13 @@
             this.btnRootDir.Size = new System.Drawing.Size(36, 20);
             this.btnRootDir.TabIndex = 6;
             this.btnRootDir.Text = "...";
+            this.toolTip1.SetToolTip(this.btnRootDir, "Take a file, the containting dir will be selected");
             this.btnRootDir.UseVisualStyleBackColor = true;
             this.btnRootDir.Click += new System.EventHandler(this.btnRootDir_Click);
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(12, 439);
+            this.btnStart.Location = new System.Drawing.Point(12, 456);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 23);
             this.btnStart.TabIndex = 7;
@@ -124,7 +133,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(175, 439);
+            this.btnCancel.Location = new System.Drawing.Point(175, 456);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 8;
@@ -136,7 +145,7 @@
             // 
             this.progBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progBar.Location = new System.Drawing.Point(11, 324);
+            this.progBar.Location = new System.Drawing.Point(11, 342);
             this.progBar.Name = "progBar";
             this.progBar.Size = new System.Drawing.Size(526, 23);
             this.progBar.TabIndex = 9;
@@ -154,13 +163,15 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.numIgnoreRules);
+            this.groupBox1.Controls.Add(this.label9);
             this.groupBox1.Controls.Add(this.lbInfo);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.lbTotalFiles);
             this.groupBox1.Controls.Add(this.lbTotalLines);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Location = new System.Drawing.Point(11, 354);
+            this.groupBox1.Location = new System.Drawing.Point(11, 371);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(526, 81);
             this.groupBox1.TabIndex = 11;
@@ -242,11 +253,94 @@
             this.label7.TabIndex = 15;
             this.label7.Text = "Found Files:";
             // 
+            // btnChooseIgnoreFile
+            // 
+            this.btnChooseIgnoreFile.Location = new System.Drawing.Point(501, 97);
+            this.btnChooseIgnoreFile.Name = "btnChooseIgnoreFile";
+            this.btnChooseIgnoreFile.Size = new System.Drawing.Size(36, 20);
+            this.btnChooseIgnoreFile.TabIndex = 17;
+            this.btnChooseIgnoreFile.Text = "...";
+            this.btnChooseIgnoreFile.UseVisualStyleBackColor = true;
+            this.btnChooseIgnoreFile.Click += new System.EventHandler(this.btnChooseIgnoreFile_Click);
+            // 
+            // tbIgnoreFileConfig
+            // 
+            this.tbIgnoreFileConfig.Location = new System.Drawing.Point(75, 97);
+            this.tbIgnoreFileConfig.Name = "tbIgnoreFileConfig";
+            this.tbIgnoreFileConfig.Size = new System.Drawing.Size(420, 20);
+            this.tbIgnoreFileConfig.TabIndex = 18;
+            this.toolTip1.SetToolTip(this.tbIgnoreFileConfig, resources.GetString("tbIgnoreFileConfig.ToolTip"));
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(9, 99);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(56, 13);
+            this.label8.TabIndex = 19;
+            this.label8.Text = "Ignore file:";
+            // 
+            // rbAllLines
+            // 
+            this.rbAllLines.AutoSize = true;
+            this.rbAllLines.Checked = true;
+            this.rbAllLines.Location = new System.Drawing.Point(75, 123);
+            this.rbAllLines.Name = "rbAllLines";
+            this.rbAllLines.Size = new System.Drawing.Size(59, 17);
+            this.rbAllLines.TabIndex = 20;
+            this.rbAllLines.TabStop = true;
+            this.rbAllLines.Text = "all lines";
+            this.rbAllLines.UseVisualStyleBackColor = true;
+            // 
+            // rbIgnoreEmptyLines
+            // 
+            this.rbIgnoreEmptyLines.AutoSize = true;
+            this.rbIgnoreEmptyLines.Location = new System.Drawing.Point(140, 123);
+            this.rbIgnoreEmptyLines.Name = "rbIgnoreEmptyLines";
+            this.rbIgnoreEmptyLines.Size = new System.Drawing.Size(109, 17);
+            this.rbIgnoreEmptyLines.TabIndex = 21;
+            this.rbIgnoreEmptyLines.Text = "ignore empty lines";
+            this.rbIgnoreEmptyLines.UseVisualStyleBackColor = true;
+            // 
+            // rbIgnoreEmptyOrWhitespaceLines
+            // 
+            this.rbIgnoreEmptyOrWhitespaceLines.AutoSize = true;
+            this.rbIgnoreEmptyOrWhitespaceLines.Location = new System.Drawing.Point(255, 123);
+            this.rbIgnoreEmptyOrWhitespaceLines.Name = "rbIgnoreEmptyOrWhitespaceLines";
+            this.rbIgnoreEmptyOrWhitespaceLines.Size = new System.Drawing.Size(200, 17);
+            this.rbIgnoreEmptyOrWhitespaceLines.TabIndex = 22;
+            this.rbIgnoreEmptyOrWhitespaceLines.Text = "ignore empty or only whitespace lines";
+            this.rbIgnoreEmptyOrWhitespaceLines.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(283, 21);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(70, 13);
+            this.label9.TabIndex = 16;
+            this.label9.Text = "Ignore Rules:";
+            // 
+            // numIgnoreRules
+            // 
+            this.numIgnoreRules.AutoSize = true;
+            this.numIgnoreRules.Location = new System.Drawing.Point(359, 21);
+            this.numIgnoreRules.Name = "numIgnoreRules";
+            this.numIgnoreRules.Size = new System.Drawing.Size(13, 13);
+            this.numIgnoreRules.TabIndex = 17;
+            this.numIgnoreRules.Text = "--";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(551, 560);
+            this.Controls.Add(this.rbIgnoreEmptyOrWhitespaceLines);
+            this.Controls.Add(this.rbIgnoreEmptyLines);
+            this.Controls.Add(this.rbAllLines);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.tbIgnoreFileConfig);
+            this.Controls.Add(this.btnChooseIgnoreFile);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.tbFoundFiles);
             this.Controls.Add(this.tbExtensions);
@@ -292,6 +386,14 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox tbFoundFiles;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button btnChooseIgnoreFile;
+        private System.Windows.Forms.TextBox tbIgnoreFileConfig;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.RadioButton rbAllLines;
+        private System.Windows.Forms.RadioButton rbIgnoreEmptyLines;
+        private System.Windows.Forms.RadioButton rbIgnoreEmptyOrWhitespaceLines;
+        private System.Windows.Forms.Label numIgnoreRules;
+        private System.Windows.Forms.Label label9;
     }
 }
 

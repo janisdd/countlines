@@ -111,11 +111,19 @@ namespace CountLines
 
         private async void btnStart_Click(object sender, EventArgs e)
         {
+            rbAllLines.Enabled = false;
+            rbIgnoreEmptyLines.Enabled = false;
+            rbIgnoreEmptyOrWhitespaceLines.Enabled = false;
+
             _currentResult = new CountLinesResult();
             lbInfo.Text = "";
+            numIgnoreRules.Text = "";
             _totalFilesToScan = 0;
             progBar.Value = 0;
             tbFoundFiles.Clear();
+
+            bool ignoreEmptyLines = rbIgnoreEmptyLines.Checked;
+            bool ignoreEmptyorWhitespaceLines = rbIgnoreEmptyOrWhitespaceLines.Checked;
 
             if (String.IsNullOrWhiteSpace(tbRootDir.Text)) return;
 
@@ -125,34 +133,67 @@ namespace CountLines
             if (!rootDir.Exists)
             {
                 MessageBox.Show(@"Root directory path is not a directory");
+                ResetButtons();
                 return;
             }
+
 
 
             //get extensions
             var extensions = tbExtensions.Text.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList();
-
+       
             if (extensions.Count == 0)
             {
                 MessageBox.Show(@"No extensions provided");
+                ResetButtons();
                 return;
             }
 
+
             //get files and directories to ignore
-            var ignoreList = tbIgnoreList.Lines;
+            var ignoreList = new HashSet<string>(tbIgnoreList.Lines);
+
+            //also add the ignore files lines
+
+            if (string.IsNullOrEmpty(tbIgnoreFileConfig.Text) == false)
+            {
+                var ignoreFileInfo = new FileInfo(tbIgnoreFileConfig.Text);
+
+                if (!ignoreFileInfo.Exists)
+                {
+                    MessageBox.Show(@"Ignore file not found");
+                    ResetButtons();
+                    return;
+                }
+                var additionalRules = File.ReadAllLines(ignoreFileInfo.FullName).ToList();
+                additionalRules.ForEach(rule => ignoreList.Add(rule));
+            }
+
             var filesToIgnore = new List<FileInfo>();
             var directoriesToIgnore = new List<DirectoryInfo>();
 
             foreach (var ignoreItem in ignoreList)
             {
+
+                if (ignoreItem.Trim().StartsWith("#")) continue;
+
                 var infoDir = new DirectoryInfo(ignoreItem.Trim());
                 var infoFile = new FileInfo(ignoreItem.Trim());
 
 
                 if (!infoDir.Exists && !infoFile.Exists)
                 {
-                    MessageBox.Show(ignoreItem + " is not a directory or file");
-                    return;
+                    //maybe relative path??
+
+                    infoDir = new DirectoryInfo(Path.Combine(rootDir.FullName, ignoreItem.Trim()));
+                    infoFile = new FileInfo(Path.Combine(rootDir.FullName, ignoreItem.Trim()));
+
+                    if (!infoDir.Exists && !infoFile.Exists)
+                    {
+                        MessageBox.Show(ignoreItem + " is not a directory or file");
+                        ResetButtons();
+                        return;
+                    }
                 }
 
                 if (infoDir.Exists)
@@ -164,6 +205,8 @@ namespace CountLines
                     filesToIgnore.Add(infoFile);
                 }
             }
+
+            numIgnoreRules.Text = "Ignore rules: " + (directoriesToIgnore.Count + filesToIgnore.Count);
 
             //btnPause.Enabled = true;
             btnCancel.Enabled = true;
@@ -196,7 +239,9 @@ namespace CountLines
             await this.Scan(rootDir,
                 extensions.Select(p => "." + p).ToList(),
                 filesToIgnore.Select(p => p.FullName).ToList(),
-                directoriesToIgnore.Select(p => p.FullName).ToList()
+                directoriesToIgnore.Select(p => p.FullName).ToList(),
+                ignoreEmptyLines,
+                ignoreEmptyorWhitespaceLines
             );
 
             lbTotalLines.Text = _currentResult.Lines.ToString();
@@ -219,6 +264,9 @@ namespace CountLines
             //btnPause.Enabled = false;
             btnCancel.Enabled = false;
             btnStart.Enabled = true;
+            rbAllLines.Enabled = true;
+            rbIgnoreEmptyLines.Enabled = true;
+            rbIgnoreEmptyOrWhitespaceLines.Enabled = true;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -237,6 +285,19 @@ namespace CountLines
             if (!info.Exists) return;
 
             tbRootDir.Text = info.DirectoryName;
+        }
+
+        private void btnChooseIgnoreFile_Click(object sender, EventArgs e)
+        {
+            var result = _dialog.ShowDialog();
+
+            if (result != DialogResult.OK) return;
+
+            var info = new FileInfo(_dialog.FileName);
+
+            if (!info.Exists) return;
+
+            tbIgnoreFileConfig.Text = info.FullName;
         }
 
 
@@ -313,7 +374,7 @@ namespace CountLines
         /// <param name="directoriesToIgnore">the sub directories to ignore</param>
         /// <returns></returns>
         private async Task Scan(DirectoryInfo rootDir, List<string> extensions, List<string> filesToignore,
-            List<string> directoriesToIgnore)
+            List<string> directoriesToIgnore, bool ignoreEmptyLines, bool ignoreEmptyorWhitespaceLines)
         {
             await Task.Run(async () =>
             {
@@ -326,7 +387,21 @@ namespace CountLines
                     //ensure the file extension is in the extensions list
                     if (extensions.Contains(fileInfo.Extension) == false) continue;
 
-                    int lines = File.ReadLines(fileInfo.FullName).Count();
+                    int lines = 0;
+
+                    if (ignoreEmptyLines)
+                    {
+                        lines = File.ReadLines(fileInfo.FullName).Where(p => !string.IsNullOrEmpty(p)).Count();
+                    }
+                    else if (ignoreEmptyorWhitespaceLines)
+                    {
+                        lines = File.ReadLines(fileInfo.FullName).Where(p => !string.IsNullOrWhiteSpace(p)).Count();
+                    }
+                    else
+                    {
+                        lines = File.ReadLines(fileInfo.FullName).Count();
+                    }
+
                     _currentResult.Lines += lines;
                     _currentResult.Files += 1;
                     ReportProgress(fileInfo.FullName + "(" + lines + ")");
@@ -342,10 +417,11 @@ namespace CountLines
                     //is the directory ignored?
                     if (directoriesToIgnore.Contains(directoryInfo.FullName)) continue;
 
-                    await this.Scan(directoryInfo, extensions, filesToignore, directoriesToIgnore);
+                    await this.Scan(directoryInfo, extensions, filesToignore, directoriesToIgnore, ignoreEmptyLines, ignoreEmptyorWhitespaceLines);
                 }
             }, _cancelToken.Token);
         }
+
     }
 
     struct CountLinesResult
